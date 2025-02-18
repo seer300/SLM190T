@@ -2747,12 +2747,12 @@ void sim_apdu_process(uint8_t *pApduBuf,uint8_t *pRxBuffer,uint32_t *uLen)
 
 }
 
-void SC7816_command(uint8_t *pApduBuf,uint8_t *pRxBuffer,uint32_t *uLen)
+void SC7816_command(uint8_t *pApduBuf, uint8_t *pRxBuffer, uint32_t *uLen)
 {
-	if(Is_vsim_type())
-		vsim_apdu_process(pApduBuf,*uLen,pRxBuffer,uLen);
+	if( Is_softsim_type() )
+		softsim_apdu_process(pApduBuf, *uLen, pRxBuffer, uLen); // SoftSIM APDU Handler
 	else
-		sim_apdu_process(pApduBuf,pRxBuffer,uLen);
+		sim_apdu_process(pApduBuf,pRxBuffer,uLen); // 实体SIM
 }
 
 

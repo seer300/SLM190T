@@ -12,9 +12,10 @@ add_subdirectory(netled)
 add_subdirectory(perf)
 add_subdirectory(ping)
 add_subdirectory(socket)
-add_subdirectory(wakaama)
-add_subdirectory(wireshark)
+# add_subdirectory(wakaama) 	# Disabled during SoftSIM deevelopment
+# add_subdirectory(wireshark) 	# Disabled during SoftSIM deevelopment
 add_subdirectory(fota)
+add_subdirectory(onomondo)
 
 change_section_config(${TARGET_NAME} "${CMAKE_CURRENT_SOURCE_DIR}" FALSE .text=.flash.text .rodata=.flash.rodata)
 

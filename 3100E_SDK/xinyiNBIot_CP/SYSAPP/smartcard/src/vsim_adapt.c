@@ -27,11 +27,7 @@ void vsim_Init()
 
 bool Is_vsim_type()
 {
-#if 1
 	return 0;
-#else
-	return (g_softap_fac_nv->sim_type==0);
-#endif
 }
 
 
