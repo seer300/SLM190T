@@ -1198,23 +1198,142 @@ int at_NPSMR_req(char *at_buf, char **prsp_cmd)
 //显示产品标识信息ATI
 int at_ATI_req(char *at_buf, char **prsp_cmd)
 {
-	(void) at_buf;
-
-	if(g_req_type==AT_CMD_REQ || g_req_type==AT_CMD_ACTIVE)
+	if(g_req_type==AT_CMD_ACTIVE)
 	{
 		*prsp_cmd = xy_malloc(128);
-#if VER_BC95
-		snprintf(*prsp_cmd, 128, "\r\nXY1200\r\n%s\r\nRevision:%s", MODULE_VER_STR, PRODUCT_VER);
-#else
-		snprintf(*prsp_cmd, 128, "XY1200\r\n%s\r\nRevision:%s\r\n\r\nOK\r\n", MODULE_VER_STR, PRODUCT_VER);
-#endif //VER_QUECTE		
+
+		snprintf(*prsp_cmd, 128, 
+			"\r\n%s\r\n%s\r\nRevision:%s_T%sS%s\r\n\r\nOK\r\n", 
+			VENDOR_NAME,
+			PRODUCT_NAME, 
+			PRODUCT_NAME,
+			VERSION_INFO_NEW,
+			BUILD_DATE
+			);	
+	}
+	else
+	{
+		return  (ATERR_PARAM_INVALID);
+	}
+	return AT_END;
+}
+
+int at_SGSW_req(char *at_buf, char **prsp_cmd)
+{
+	//SLM130-NA.1.2.0.0T00S0531_M018_XY1200S
+	if(g_req_type==AT_CMD_ACTIVE)
+	{
+		*prsp_cmd = xy_malloc(128);
+		snprintf(*prsp_cmd, 128, "\r\n%s.%sT%sS%s_%s_%s\r\n\r\nOK\r\n",
+			PRODUCT_NAME,
+			BOARD_PATCH,
+			VERSION_INFO_NEW,
+			BUILD_DATE,
+			VERSION_DEV_TYPE,
+			MODULE_CHIP_NAME
+			);
 	}
 	else
 	{
 		return  (ATERR_PARAM_INVALID);
 	}
 
-	return AT_END;
+	return AT_END;	
+}
+
+// SoftSIM密钥配置AT命令
+// eg: AT+SOFTSIM=011208294305123023660802149854370000003262865003202BA2E2461C022E31F0AF0735FC4B455904207DFEF49A5BA53AF1290C3945A57F56000520F6A02E230228EFC0A7D5014CBD1399DB0620BC6628E23DD24B502DD8F345AF0DB0B0
+int at_SOFTSIM_req(char *at_buf, char **prsp_cmd){
+	// 判断用户的动作
+	if ( g_req_type == AT_CMD_ACTIVE )
+	{
+		// AT+XXX 查询密钥
+		*prsp_cmd = xy_malloc(360);
+		char secretkey1[351] = {0};
+
+		xy_file fp = xy_fopen("ss_SIMKEY.key","r",FS_DEFAULT);
+		if ( fp == NULL )
+		{
+			// 文件不存在
+			snprintf(*prsp_cmd,20,"+SOFTSIM:NULL");
+			return AT_END;
+		}
+		int readcount = xy_fread(secretkey1, 351, fp);
+
+		snprintf(*prsp_cmd,360,"+SOFTSIM:%s", secretkey1);
+		xy_fclose(fp);
+
+		return AT_END;
+	}
+
+	if ( g_req_type == AT_CMD_REQ )
+	{
+		// AT+XXX=param  设置密钥
+		char secretkey[351] = {0};
+
+		if(at_parse_param("%s", at_buf, secretkey) != AT_OK)
+		{
+			return  (ATERR_PARAM_INVALID);
+		}
+
+		xy_printf(0, PLATFORM, FATAL_LOG, "%d", strlen(secretkey));
+
+		// 准备写入文件
+		xy_fremove("ss_SIMKEY.key", FS_DEFAULT);
+		xy_printf(0, PLATFORM, FATAL_LOG, "");
+		xy_file fp = xy_fopen("ss_SIMKEY.key","w", FS_DEFAULT);
+		xy_printf(0, PLATFORM, FATAL_LOG, "");
+
+		int writeCount = xy_fwrite(secretkey, strlen(secretkey), fp);
+		xy_printf(0, PLATFORM, FATAL_LOG, "");
+		xy_fclose(fp);
+
+		return AT_END;
+	}
+	
+	return ATERR_PARAM_INVALID;
+}
+
+// 切换UICC模式
+// AT+SWUICC=0 sim
+// AT+SWUICC=1 softsim
+int at_SWUICC_req(char *at_buf, char **prsp_cmd){
+	int uiccmode = 1;
+	if ( g_req_type == AT_CMD_ACTIVE )
+	{
+		*prsp_cmd = xy_malloc(11);
+
+		xy_file fp = xy_fopen("uiccmode.txt","r",FS_DEFAULT);
+		if ( fp == NULL )
+		{
+			// 文件不存在
+			snprintf(*prsp_cmd,11,"+SWUICC:1");
+			return AT_END;
+		}
+		int readcount = xy_fread(&uiccmode, sizeof(int), fp);
+
+		snprintf(*prsp_cmd,11,"+SWUICC:%d", uiccmode);
+		xy_fclose(fp);
+
+		return AT_END;
+	}
+
+	if ( g_req_type == AT_CMD_REQ )
+	{
+		if(at_parse_param("%d", at_buf, &uiccmode) != AT_OK)
+		{
+			return  (ATERR_PARAM_INVALID);
+		}
+
+		// 准备写入文件
+		xy_fremove("uiccmode.txt", FS_DEFAULT);
+		xy_file fp = xy_fopen("uiccmode.txt","w", FS_DEFAULT);
+
+		int writeCount = xy_fwrite(&uiccmode, sizeof(int), fp);
+		xy_fclose(fp);
+
+		return AT_END;
+	}
 }
 
 //获取产品版本号AT+QGMR

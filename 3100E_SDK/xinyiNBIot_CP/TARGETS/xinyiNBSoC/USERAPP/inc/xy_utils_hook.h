@@ -9,10 +9,20 @@
 
 /********************************** 版本相关 **********************************/
 /* 设备型号，用户可自行更改 */
-#define MODULE_VER_STR          "XY1200"
+#define MODULE_VER_STR          "XY3100"
+#define PRODUCT_NAME         "SLM130-NA"
 
-/* 软件版本号，用户可自行更改 */
-#define PRODUCT_VER         "XY1200"
+#define VENDOR_NAME          "MeiG"
+#define MODULE_CHIP_NAME     "XY3100E"
+#define PRODUCT_VER PRODUCT_NAME
+#define MODULE_VER_STR  PRODUCT_NAME
+
+
+#define BOARD_PATCH      	 "1.2.5.2"
+#define VERSION_DEV_TYPE	 "M019"
+
+#define BUILD_DATE           "1231"
+#define VERSION_INFO_NEW	 "09"
 
 /********************************** 云业务相关 **********************************/
 /**

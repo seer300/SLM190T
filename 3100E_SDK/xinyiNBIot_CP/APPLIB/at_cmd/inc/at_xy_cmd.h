@@ -15,5 +15,9 @@ int at_QGMR_req(char *at_buf, char **prsp_cmd);
 int at_QVERTIME_req(char *at_buf, char **prsp_cmd);
 int at_DUMP_req(char *at_buf, char **prsp_cmd);
 
+// MG add
+int at_SGSW_req(char *at_buf, char **prsp_cmd);
+int at_SOFTSIM_req(char *at_buf, char **prsp_cmd);
+int at_SWUICC_req(char *at_buf, char **prsp_cmd);
 
 
