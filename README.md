@@ -32,4 +32,7 @@ python --version
 
 ## 分支说明
 ### master
-
+默认分支
+### softsim
+移植了来自XY1200S的SoftSIM相关代码  
+供Triciti客户使用
